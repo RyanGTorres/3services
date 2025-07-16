@@ -11,11 +11,11 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "TB_EMAIL")
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailModel {
 
+    @Transient
     private final long serialVersionUID = 1L;
 
     @Id
@@ -29,4 +29,72 @@ public class EmailModel {
     private String body;
     private LocalDateTime sendDateEmail;
     private EmailStatus statusEmail;
+
+    public long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public UUID getEmailId() {
+        return emailId;
+    }
+
+    public void setEmailId(UUID emailId) {
+        this.emailId = emailId;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
+    public String getEmailFrom() {
+        return emailFrom;
+    }
+
+    public void setEmailFrom(String emailFrom) {
+        this.emailFrom = emailFrom;
+    }
+
+    public String getEmailTo() {
+        return emailTo;
+    }
+
+    public void setEmailTo(String emailTo) {
+        this.emailTo = emailTo;
+    }
+
+    public String getEmailSubject() {
+        return emailSubject;
+    }
+
+    public void setEmailSubject(String emailSubject) {
+        this.emailSubject = emailSubject;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public LocalDateTime getSendDateEmail() {
+        return sendDateEmail;
+    }
+
+    public void setSendDateEmail(LocalDateTime sendDateEmail) {
+        this.sendDateEmail = sendDateEmail;
+    }
+
+    public EmailStatus getStatusEmail() {
+        return statusEmail;
+    }
+
+    public void setStatusEmail(EmailStatus statusEmail) {
+        this.statusEmail = statusEmail;
+    }
 }
