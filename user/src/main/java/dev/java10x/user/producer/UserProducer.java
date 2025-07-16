@@ -2,6 +2,7 @@ package dev.java10x.user.producer;
 import dev.java10x.user.domain.UserModel;
 import dev.java10x.user.dto.EmailDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -9,11 +10,14 @@ public class UserProducer {
 
    final RabbitTemplate rabbitTemplate;
 
+    @Value("${EMAIL_QUEUE}")
+    private String routingKey;
+
     public UserProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    private final String routingKey = "email-queue";
+    // removido: private final String routingKey = "email-queue";
 
     public void publishEvent(UserModel userModel) {
         var emailDto = new EmailDto();

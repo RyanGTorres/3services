@@ -16,8 +16,8 @@ spring:
 
   rabbitmq:
     addresses: amqps://duck.lmq.cloudamqp.com
-    username: pofhowkh
-    password: k9c2_fvTcBgrx3nmoGrYPcWZSzPKCYA-
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
     virtual-host: pofhowkh
 
 server:
