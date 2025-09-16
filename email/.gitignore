@@ -40,7 +40,7 @@ gradle.properties
 
 ## VS Code
 .vscode/
-
+.env
 ## NetBeans
 nbproject/private/
 nbbuild/

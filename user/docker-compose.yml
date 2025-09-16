@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16
-    container_name: ms-user-db
+    container_name: user-db
     environment:
       POSTGRES_DB: ms-user-ms
       POSTGRES_USER: postgres-user
