@@ -1,26 +1,25 @@
 package dev.java10x.email.consumer;
-import dev.java10x.email.domain.EmailModel;
+
 import dev.java10x.email.dto.EmailDto;
+import dev.java10x.email.entity.EmailEntity;
 import dev.java10x.email.service.EmailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class EmailConsumer {
-
-    final EmailService emailService;
-
-    public EmailConsumer(EmailService emailService) {
-        this.emailService = emailService;
-    }
+    private final RabbitTemplate rabbitTemplate;
+    private final EmailService emailService;
 
     @RabbitListener(queues = "email-queue")
-    public void listenEmailQueue(@Payload EmailDto emailDto) {
-       var emailModel = new EmailModel();
-        BeanUtils.copyProperties(emailDto, emailModel);
-        emailService.sendEmail(emailModel);
+    public void listenEmailQueue(@Payload EmailDto emailDto){
+        var emailEntity = new EmailEntity();
+        BeanUtils.copyProperties(emailDto, emailEntity);
+        emailService.sendMail(emailEntity);
     }
-
 }

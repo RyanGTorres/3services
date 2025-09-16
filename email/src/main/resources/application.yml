@@ -1,13 +1,33 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/ms_email_ms
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5402/ms_email_ms
+    username: postgres_email_pb
+    password: postgres_password
+
+  rabbitmq:
+    addresses: possum.lmq.cloudamqp.com
+    username: gttcxdpc
+    password: 4-6zqXVQe9IlT0EkjdzVq4WTzKwbgWIH
+    virtual-host: gttcxdpc
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL-NAME}
+    password: ${EMAIL-PASSWORD}
+    properties:
+        mail:
+            smtp:
+                auth: true
+                starttls:
+                  enable: true
+                connectiontimeout: 5000
+                timeout: 3000
+                writetimeout: 5000
 
   jpa:
     hibernate:
-    ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -36,6 +56,11 @@ spring:
       starttls:
       enable: true
 
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
 server:
   port: 8080

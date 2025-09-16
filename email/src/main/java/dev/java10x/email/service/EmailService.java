@@ -1,44 +1,43 @@
 package dev.java10x.email.service;
-import dev.java10x.email.domain.EmailModel;
+
+import dev.java10x.email.entity.EmailEntity;
 import dev.java10x.email.enums.EmailStatus;
-import dev.java10x.email.repositorie.EmailRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.java10x.email.repository.EmailRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender javaMailSender;
+    private final EmailRepository emailRepository;
 
-    @Autowired
-    private EmailRepository emailRepository;
-
-    @Value("${EMAIL_USERNAME}")
+    @Value("${EMAIL-NAME}")
     private String emailFrom;
 
-    @Transactional
-    public void sendEmail(EmailModel emailModel) {
-        try {
+    public void sendMail(EmailEntity emailEntity){
+        try{
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(emailFrom);
-            message.setTo(emailModel.getEmailTo());
-            message.setSubject(emailModel.getEmailSubject());
-            message.setText(emailModel.getBody());
-            mailSender.send(message);
-            emailModel.setStatusEmail(EmailStatus.SENT);
-            emailModel.setSendDateEmail(LocalDateTime.now());
-        } catch (Exception e) {
-            emailModel.setStatusEmail(EmailStatus.FAILED);
-            System.out.println("Erro ao enviar email: " + e.getMessage());
+            message.setTo(emailEntity.getEmailTo());
+            message.setSubject(emailEntity.getEmailSubject());
+            message.setText(emailEntity.getBody());
+            javaMailSender.send(message);
+            emailEntity.setEmailFrom(emailFrom);
+            emailEntity.setSendedAt(java.time.LocalDateTime.now());
+            emailEntity.setEmailStatus(EmailStatus.ENVIADO);
+            System.out.println("Email sent successfully to " + emailEntity.getEmailTo());
         }
-
-        emailRepository.save(emailModel);
+        catch (Exception e){
+            emailEntity.setEmailStatus(EmailStatus.FALHOU);
+            System.out.println("Error sending email: " + e.getMessage());
+        }
+        emailRepository.save(emailEntity);
     }
-
 }

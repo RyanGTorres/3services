@@ -1,49 +1,49 @@
 package dev.java10x.user.service;
-import dev.java10x.user.domain.UserModel;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import dev.java10x.user.entity.UserEntity;
+import dev.java10x.user.exceptions.EmailAlreadyExistsException;
 import dev.java10x.user.producer.UserProducer;
-import dev.java10x.user.repositorie.UserRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.java10x.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-
-    @Autowired
     private final UserRepository userRepository;
     private final UserProducer userProducer;
 
-    public UserService(UserRepository userRepository, UserProducer userProducer) {
-        this.userRepository = userRepository;
-        this.userProducer = userProducer;
+    @Transactional
+    public UserEntity saveUser(UserEntity userEntity) throws JsonProcessingException {
+        if (userRepository.findByEmail(userEntity.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already exists: " + userEntity.getEmail());
+        }
+        userEntity = userRepository.save(userEntity);
+        userProducer.enviarUsuarioProduce(userEntity);
+        return userEntity;
     }
 
-    /**
-     * Retrieves all users from the database.
-     * This method queries the UserRepository to fetch and return a list of all UserModel entities.
-     *
-     * @return a list containing all users in the database
-     */
-    public List<UserModel> getAllUsers() {
+    public List<UserEntity> getAllUsers() {
         return userRepository.findAll();
     }
-
-    /**
-     * Saves the given UserModel to the database and then publishes an event with the saved user.
-     * This method is transactional, ensuring that the event is only published if the user is successfully saved.
-     * First, it persists the user using the UserRepository, then it triggers the UserProducer to publish the event.
-     *
-     * @param userModel the user entity to be saved and published
-     * @return the persisted UserModel
-     */
-    @Transactional
-    public UserModel saveAndPublish (UserModel userModel) {
-        userModel = userRepository.save(userModel);
-        userProducer.publishEvent(userModel);
-        return userModel;
+    public void deleteUser(UUID id) {
+        userRepository.deleteById(id);
     }
 
-
+    public void findByEmail(String email) {
+        userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+    public UserEntity updateUser(UUID id, UserEntity userEntity) {
+        UserEntity existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        BeanUtils.copyProperties(userEntity, existingUser, "userId");
+        return userRepository.save(existingUser);
+    }
 }

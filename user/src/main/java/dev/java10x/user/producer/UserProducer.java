@@ -1,32 +1,30 @@
 package dev.java10x.user.producer;
-import dev.java10x.user.domain.UserModel;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.java10x.user.dto.EmailDto;
+import dev.java10x.user.entity.UserEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+
 @Component
+@RequiredArgsConstructor
 public class UserProducer {
+    private final RabbitTemplate rabbitTemplate;
+    ObjectMapper objectMapper = new ObjectMapper();
 
-   final RabbitTemplate rabbitTemplate;
+    private final String ROUT_NAME = "email-queue";
 
-    @Value("${EMAIL_QUEUE}")
-    private String routingKey;
+    public void enviarUsuarioProduce(UserEntity userEntity) throws JsonProcessingException {
+        var emailSend  = new EmailDto();
+        emailSend.setUserId(userEntity.getUserId());
+        emailSend.setEmailTo(userEntity.getEmail());
+        emailSend.setEmailSubject("Email de confirmação!");
+        emailSend.setBody("Aqui seu link de confirmação: .... ");
 
-    public UserProducer(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+        rabbitTemplate.setRoutingKey(ROUT_NAME);
+        rabbitTemplate.convertAndSend(emailSend);
     }
-
-    // removido: private final String routingKey = "email-queue";
-
-    public void publishEvent(UserModel userModel) {
-        var emailDto = new EmailDto();
-        emailDto.setUserId(userModel.getUserId());
-        emailDto.setEmailTo(userModel.getEmail());
-        emailDto.setEmailSubject("Welcome to Java10x");
-        emailDto.setBody("Hello " + userModel.getName() + ",\n\nWelcome to Java10x! We are excited to have you on board.\n\nBest regards,\nJava10x Team");
-
-        rabbitTemplate.convertAndSend("", routingKey, emailDto);
-    }
-
 }
