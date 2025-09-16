@@ -8,3 +8,4 @@ public record EmailDto (
         String emailTo,
         String body
 ) {}
+

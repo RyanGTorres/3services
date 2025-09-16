@@ -10,8 +10,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.beans.BeanUtils.copyProperties;
-
 @Component
 @RequiredArgsConstructor
 public class EmailConsumer {
